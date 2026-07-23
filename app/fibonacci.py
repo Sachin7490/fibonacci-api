@@ -1,6 +1,6 @@
 def calculate_fibonacci(n: int) -> int:
     """
-    Returns the nth Fibonacci number.
+    Calculate the nth Fibonacci number.
 
     Time Complexity: O(n)
     Space Complexity: O(1)

@@ -3,6 +3,9 @@ from fastapi import FastAPI, HTTPException, Query
 from app.fibonacci import calculate_fibonacci
 from app.models import FibonacciResponse
 from app.logger import logger
+from app.telemetry import configure_telemetry
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from app.observability import RequestLoggingMiddleware
 
 app = FastAPI(
     title="Fibonacci API",
@@ -12,13 +15,17 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
+app.add_middleware(RequestLoggingMiddleware)
+configure_telemetry()
+FastAPIInstrumentor.instrument_app(app)
+
 
 @app.get("/", tags=["Home"])
 def home():
     """
     Root endpoint.
     """
-    logger.info("Home endpoint accessed")
+    #logger.info("Home endpoint accessed")
 
     return {
         "application": "Fibonacci API",
@@ -47,12 +54,12 @@ def get_fibonacci(
         /fibonacci?n=10
     """
 
-    logger.info(f"Received Fibonacci request for n={n}")
+    #logger.info(f"Received Fibonacci request for n={n}")
 
     try:
         value = calculate_fibonacci(n)
 
-        logger.info(f"Returning Fibonacci value={value}")
+        #logger.info(f"Returning Fibonacci value={value}")
 
         return FibonacciResponse(
             n=n,

@@ -1,6 +1,5 @@
 import time
 
-from fastapi import Request
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.logger import logger
@@ -8,19 +7,22 @@ from app.logger import logger
 
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
 
-    async def dispatch(self, request: Request, call_next):
+    async def dispatch(self, request, call_next):
 
-        start_time = time.perf_counter()
+        start = time.time()
+
+        logger.info(
+            f"Incoming {request.method} {request.url.path}"
+        )
 
         response = await call_next(request)
 
-        duration_ms = (time.perf_counter() - start_time) * 1000
+        elapsed = round((time.time() - start) * 1000, 2)
 
         logger.info(
-            f"{request.method} "
-            f"{request.url.path} "
+            f"Completed {request.method} {request.url.path} "
             f"status={response.status_code} "
-            f"duration={duration_ms:.2f}ms"
+            f"duration={elapsed}ms"
         )
 
         return response
